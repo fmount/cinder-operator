@@ -35,6 +35,12 @@ spec:
           spec:
             description: CinderAPISpec defines the desired state of CinderAPI
             properties:
+              cephSecret:
+                description: CephSecret containing Ceph conf and key information for
+                  glance
+                items:
+                  type: string
+                type: array
               containerImage:
                 description: ContainerImage - Cinder API Container Image URL
                 type: string

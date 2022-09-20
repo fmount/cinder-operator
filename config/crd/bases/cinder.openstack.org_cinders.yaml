@@ -70,10 +70,21 @@ spec:
                 - cephFsid
                 - cephMons
                 type: object
+              cephSecret:
+                description: CephSecret containing Ceph conf and key information
+                items:
+                  type: string
+                type: array
               cinderAPI:
                 description: CinderAPI - Spec definition for the API service of this
                   Cinder deployment
                 properties:
+                  cephSecret:
+                    description: CephSecret containing Ceph conf and key information
+                      for glance
+                    items:
+                      type: string
+                    type: array
                   containerImage:
                     description: ContainerImage - Cinder API Container Image URL
                     type: string
@@ -193,6 +204,11 @@ spec:
                 description: CinderBackup - Spec definition for the Backup service
                   of this Cinder deployment
                 properties:
+                  cephSecret:
+                    description: CephSecret containing Ceph conf and key information
+                    items:
+                      type: string
+                    type: array
                   containerImage:
                     description: ContainerImage - Cinder Backup Container Image URL
                     type: string
@@ -311,6 +327,11 @@ spec:
                 description: CinderScheduler - Spec definition for the Scheduler service
                   of this Cinder deployment
                 properties:
+                  cephSecret:
+                    description: CephSecret containing Ceph conf and key information
+                    items:
+                      type: string
+                    type: array
                   containerImage:
                     description: ContainerImage - Cinder Scheduler Container Image
                       URL
@@ -431,6 +452,11 @@ spec:
                 additionalProperties:
                   description: CinderVolumeSpec defines the desired state of CinderVolume
                   properties:
+                    cephSecret:
+                      description: CephSecret containing Ceph conf and key information
+                      items:
+                        type: string
+                      type: array
                     containerImage:
                       description: ContainerImage - Cinder Volume Container Image
                         URL

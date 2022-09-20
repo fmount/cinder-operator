@@ -35,6 +35,11 @@ spec:
           spec:
             description: CinderVolumeSpec defines the desired state of CinderVolume
             properties:
+              cephSecret:
+                description: CephSecret containing Ceph conf and key information
+                items:
+                  type: string
+                type: array
               containerImage:
                 description: ContainerImage - Cinder Volume Container Image URL
                 type: string

@@ -82,6 +82,10 @@ type CinderAPISpec struct {
 	// Resources - Compute Resources required by this service (Limits/Requests).
 	// https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
+
+	// +kubebuilder:validation:Required
+	// CephSecret containing Ceph conf and key information for glance
+	CephSecret []string `json:"cephSecret,omitempty"`
 }
 
 // CinderAPIStatus defines the observed state of CinderAPI

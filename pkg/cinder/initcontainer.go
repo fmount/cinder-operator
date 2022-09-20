@@ -29,6 +29,7 @@ type APIDetails struct {
 	DatabaseName         string
 	TransportURL         string
 	OSPSecret            string
+	CephSecret           []string
 	DBPasswordSelector   string
 	UserPasswordSelector string
 	VolumeMounts         []corev1.VolumeMount

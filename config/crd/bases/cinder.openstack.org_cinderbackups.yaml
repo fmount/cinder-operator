@@ -35,6 +35,11 @@ spec:
           spec:
             description: CinderBackupSpec defines the desired state of CinderBackup
             properties:
+              cephSecret:
+                description: CephSecret containing Ceph conf and key information
+                items:
+                  type: string
+                type: array
               containerImage:
                 description: ContainerImage - Cinder Backup Container Image URL
                 type: string

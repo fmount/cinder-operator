@@ -5,11 +5,11 @@ import (
 )
 
 // GetVolumes -
-func GetVolumes(name string) []corev1.Volume {
+func GetVolumes(name string, cephsecret []string) []corev1.Volume {
 	var scriptsVolumeDefaultMode int32 = 0755
 	var config0640AccessMode int32 = 0640
 
-	return []corev1.Volume{
+	vms := []corev1.Volume{
 		{
 			Name: "etc-machine-id",
 			VolumeSource: corev1.VolumeSource{
@@ -55,12 +55,36 @@ func GetVolumes(name string) []corev1.Volume {
 			},
 		},
 	}
+	// Get all the (ceph) secrets passed as argument
+	var p []corev1.VolumeProjection
 
+	for _, v := range cephsecret {
+		curr := corev1.VolumeProjection{
+			Secret: &corev1.SecretProjection{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: v,
+				},
+			},
+		}
+		p = append(p, curr)
+	}
+
+	if len(cephsecret) > 0 {
+		curr := corev1.Volume{
+			Name: "ceph-client-conf",
+			VolumeSource: corev1.VolumeSource{
+				Projected: &corev1.ProjectedVolumeSource{
+					Sources: p},
+			},
+		}
+		vms = append(vms, curr)
+	}
+	return vms
 }
 
 // GetInitVolumeMounts - Nova Control Plane init task VolumeMounts
-func GetInitVolumeMounts() []corev1.VolumeMount {
-	return []corev1.VolumeMount{
+func GetInitVolumeMounts(cephsecret []string) []corev1.VolumeMount {
+	vm := []corev1.VolumeMount{
 		{
 			Name:      "scripts",
 			MountPath: "/usr/local/bin/container-scripts",
@@ -78,11 +102,20 @@ func GetInitVolumeMounts() []corev1.VolumeMount {
 		},
 	}
 
+	if len(cephsecret) > 0 {
+		c := corev1.VolumeMount{
+			Name:      "ceph-client-conf",
+			MountPath: "/etc/ceph/",
+			ReadOnly:  true,
+		}
+		vm = append(vm, c)
+	}
+	return vm
 }
 
 // GetVolumeMounts - Nova Control Plane VolumeMounts
-func GetVolumeMounts() []corev1.VolumeMount {
-	return []corev1.VolumeMount{
+func GetVolumeMounts(cephsecret []string) []corev1.VolumeMount {
+	vm := []corev1.VolumeMount{
 		{
 			Name:      "etc-machine-id",
 			MountPath: "/etc/machine-id",
@@ -105,4 +138,13 @@ func GetVolumeMounts() []corev1.VolumeMount {
 		},
 	}
 
+	if len(cephsecret) > 0 {
+		c := corev1.VolumeMount{
+			Name:      "ceph-client-conf",
+			MountPath: "/etc/ceph/",
+			ReadOnly:  true,
+		}
+		vm = append(vm, c)
+	}
+	return vm
 }

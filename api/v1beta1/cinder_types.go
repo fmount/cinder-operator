@@ -112,6 +112,10 @@ type CinderSpec struct {
 	// +kubebuilder:validation:Optional
 	// CephBackend - The ceph Backend structure with all the parameters
 	CephBackend ceph.Backend `json:"cephBackend,omitempty"`
+
+	// +kubebuilder:validation:Required
+	// CephSecret containing Ceph conf and key information
+	CephSecret []string `json:"cephSecret,omitempty"`
 }
 
 // CinderStatus defines the observed state of Cinder

@@ -81,6 +81,10 @@ type CinderBackupSpec struct {
 	// Resources - Compute Resources required by this service (Limits/Requests).
 	// https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
+
+	// +kubebuilder:validation:Required
+	// CephSecret containing Ceph conf and key information
+	CephSecret []string `json:"cephSecret,omitempty"`
 }
 
 // CinderBackupStatus defines the observed state of CinderBackup

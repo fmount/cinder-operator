@@ -114,7 +114,7 @@ func StatefulSet(
 								RunAsUser: &runAsUser,
 							},
 							Env:            env.MergeEnvs([]corev1.EnvVar{}, envVars),
-							VolumeMounts:   GetVolumeMounts(),
+							VolumeMounts:   GetVolumeMounts(instance.Spec.CephSecret),
 							Resources:      instance.Spec.Resources,
 							ReadinessProbe: readinessProbe,
 							LivenessProbe:  livenessProbe,
@@ -126,7 +126,7 @@ func StatefulSet(
 			},
 		},
 	}
-	statefulset.Spec.Template.Spec.Volumes = GetVolumes(cinder.GetOwningCinderName(instance), instance.Name)
+	statefulset.Spec.Template.Spec.Volumes = GetVolumes(cinder.GetOwningCinderName(instance), instance.Name, instance.Spec.CephSecret)
 	// If possible two pods of the same service should not
 	// run on the same worker node. If this is not possible
 	// the get still created on the same worker node.
@@ -149,7 +149,7 @@ func StatefulSet(
 		OSPSecret:            instance.Spec.Secret,
 		DBPasswordSelector:   instance.Spec.PasswordSelectors.Database,
 		UserPasswordSelector: instance.Spec.PasswordSelectors.Service,
-		VolumeMounts:         GetInitVolumeMounts(),
+		VolumeMounts:         GetInitVolumeMounts(instance.Spec.CephSecret),
 	}
 
 	statefulset.Spec.Template.Spec.InitContainers = cinder.InitContainer(initContainerDetails)

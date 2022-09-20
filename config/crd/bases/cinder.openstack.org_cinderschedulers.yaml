@@ -35,6 +35,11 @@ spec:
           spec:
             description: CinderSchedulerSpec defines the desired state of CinderScheduler
             properties:
+              cephSecret:
+                description: CephSecret containing Ceph conf and key information
+                items:
+                  type: string
+                type: array
               containerImage:
                 description: ContainerImage - Cinder Scheduler Container Image URL
                 type: string
