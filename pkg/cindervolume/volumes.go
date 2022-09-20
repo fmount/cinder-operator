@@ -1,12 +1,15 @@
 package cindervolume
 
 import (
+	"github.com/openstack-k8s-operators/lib-common/modules/storage"
+	"strings"
+
 	"github.com/openstack-k8s-operators/cinder-operator/pkg/cinder"
 	corev1 "k8s.io/api/core/v1"
 )
 
 // GetVolumes -
-func GetVolumes(parentName string, name string) []corev1.Volume {
+func GetVolumes(parentName string, name string, extraVol []storage.CinderExtraVolMounts) []corev1.Volume {
 	var config0640AccessMode int32 = 0640
 	var dirOrCreate = corev1.HostPathDirectoryOrCreate
 
@@ -82,11 +85,13 @@ func GetVolumes(parentName string, name string) []corev1.Volume {
 		},
 	}
 
-	return append(cinder.GetVolumes(parentName), volumeVolumes...)
+	// Set the propagation levels for CinderVolume, including the backend name
+	propagation := []storage.ServiceType{storage.Cinder, storage.CinderVolume, storage.ServiceType(strings.TrimPrefix(name, "cinder-volume-"))}
+	return append(cinder.GetVolumes(parentName, extraVol, propagation), volumeVolumes...)
 }
 
 // GetInitVolumeMounts - Cinder Volume init task VolumeMounts
-func GetInitVolumeMounts() []corev1.VolumeMount {
+func GetInitVolumeMounts(name string, extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
 
 	customConfVolumeMount := corev1.VolumeMount{
 		Name:      "config-data-custom",
@@ -94,11 +99,13 @@ func GetInitVolumeMounts() []corev1.VolumeMount {
 		ReadOnly:  true,
 	}
 
-	return append(cinder.GetInitVolumeMounts(), customConfVolumeMount)
+	// Set the propagation levels for CinderVolume, including the backend name
+	propagation := []storage.ServiceType{storage.Cinder, storage.CinderVolume, storage.ServiceType(strings.TrimPrefix(name, "cinder-volume-"))}
+	return append(cinder.GetInitVolumeMounts(extraVol, propagation), customConfVolumeMount)
 }
 
 // GetVolumeMounts - Cinder Volume VolumeMounts
-func GetVolumeMounts() []corev1.VolumeMount {
+func GetVolumeMounts(name string, extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
 	volumeVolumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "etc-iscsi",
@@ -131,6 +138,7 @@ func GetVolumeMounts() []corev1.VolumeMount {
 			MountPath: "/var/lib/iscsi",
 		},
 	}
-
-	return append(cinder.GetVolumeMounts(), volumeVolumeMounts...)
+	// Set the propagation levels for CinderVolume, including the backend name
+	propagation := []storage.ServiceType{storage.Cinder, storage.CinderVolume, storage.ServiceType(strings.TrimPrefix(name, "cinder-volume-"))}
+	return append(cinder.GetVolumeMounts(extraVol, propagation), volumeVolumeMounts...)
 }

@@ -1,6 +1,8 @@
 package cinder
 
 import (
+	"github.com/openstack-k8s-operators/lib-common/modules/storage"
+
 	cinderv1beta1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	common "github.com/openstack-k8s-operators/lib-common/modules/common"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/env"
@@ -55,16 +57,16 @@ func DbSyncJob(instance *cinderv1beta1.Cinder, labels map[string]string) *batchv
 								RunAsUser: &runAsUser,
 							},
 							Env:          env.MergeEnvs([]corev1.EnvVar{}, envVars),
-							VolumeMounts: GetVolumeMounts(),
+							VolumeMounts: GetVolumeMounts([]storage.CinderExtraVolMounts{}, []storage.ServiceType{storage.DBSync}),
 						},
 					},
-					Volumes: GetVolumes(instance.Name),
+					Volumes: GetVolumes(instance.Name, []storage.CinderExtraVolMounts{}, []storage.ServiceType{storage.DBSync}),
 				},
 			},
 		},
 	}
 
-	job.Spec.Template.Spec.Volumes = GetVolumes(ServiceName)
+	job.Spec.Template.Spec.Volumes = GetVolumes(ServiceName, []storage.CinderExtraVolMounts{}, []storage.ServiceType{storage.DBSync})
 
 	initContainerDetails := APIDetails{
 		ContainerImage:       instance.Spec.CinderAPI.ContainerImage,
@@ -74,7 +76,7 @@ func DbSyncJob(instance *cinderv1beta1.Cinder, labels map[string]string) *batchv
 		OSPSecret:            instance.Spec.Secret,
 		DBPasswordSelector:   instance.Spec.PasswordSelectors.Database,
 		UserPasswordSelector: instance.Spec.PasswordSelectors.Service,
-		VolumeMounts:         GetInitVolumeMounts(),
+		VolumeMounts:         GetInitVolumeMounts([]storage.CinderExtraVolMounts{}, []storage.ServiceType{storage.DBSync}),
 	}
 	job.Spec.Template.Spec.InitContainers = InitContainer(initContainerDetails)
 

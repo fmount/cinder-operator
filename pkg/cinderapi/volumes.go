@@ -3,10 +3,11 @@ package cinderapi
 import (
 	"github.com/openstack-k8s-operators/cinder-operator/pkg/cinder"
 	corev1 "k8s.io/api/core/v1"
+	storage "lib-common/modules/storage"
 )
 
 // GetVolumes -
-func GetVolumes(parentName string, name string) []corev1.Volume {
+func GetVolumes(parentName string, name string, extraVol []storage.CinderExtraVolMounts) []corev1.Volume {
 	var config0640AccessMode int32 = 0640
 
 	backupVolumes := []corev1.Volume{
@@ -23,11 +24,11 @@ func GetVolumes(parentName string, name string) []corev1.Volume {
 		},
 	}
 
-	return append(cinder.GetVolumes(parentName), backupVolumes...)
+	return append(cinder.GetVolumes(parentName, extraVol, []storage.ServiceType{storage.Cinder, storage.CinderAPI}), backupVolumes...)
 }
 
 // GetInitVolumeMounts - Cinder API init task VolumeMounts
-func GetInitVolumeMounts() []corev1.VolumeMount {
+func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
 
 	customConfVolumeMount := corev1.VolumeMount{
 		Name:      "config-data-custom",
@@ -35,10 +36,10 @@ func GetInitVolumeMounts() []corev1.VolumeMount {
 		ReadOnly:  true,
 	}
 
-	return append(cinder.GetInitVolumeMounts(), customConfVolumeMount)
+	return append(cinder.GetInitVolumeMounts(extraVol, []storage.ServiceType{storage.Cinder, storage.CinderAPI}), customConfVolumeMount)
 }
 
 // GetVolumeMounts - Cinder API VolumeMounts
-func GetVolumeMounts() []corev1.VolumeMount {
-	return cinder.GetVolumeMounts()
+func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
+	return cinder.GetVolumeMounts(extraVol, []storage.ServiceType{storage.Cinder, storage.CinderAPI})
 }

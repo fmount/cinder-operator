@@ -2,14 +2,16 @@ package cinder
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	"lib-common/modules/storage"
 )
 
 // GetVolumes -
-func GetVolumes(name string) []corev1.Volume {
+func GetVolumes(name string, extraVol []storage.CinderExtraVolMounts, svc []storage.ServiceType) []corev1.Volume {
 	var scriptsVolumeDefaultMode int32 = 0755
 	var config0640AccessMode int32 = 0640
+	c := storage.CinderExtraVolMounts{}
 
-	return []corev1.Volume{
+	vms := []corev1.Volume{
 		{
 			Name: "etc-machine-id",
 			VolumeSource: corev1.VolumeSource{
@@ -56,11 +58,13 @@ func GetVolumes(name string) []corev1.Volume {
 		},
 	}
 
+	return c.AppendVolume(vms, extraVol, svc)
 }
 
 // GetInitVolumeMounts - Nova Control Plane init task VolumeMounts
-func GetInitVolumeMounts() []corev1.VolumeMount {
-	return []corev1.VolumeMount{
+func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts, svc []storage.ServiceType) []corev1.VolumeMount {
+	c := storage.CinderExtraVolMounts{}
+	vm := []corev1.VolumeMount{
 		{
 			Name:      "scripts",
 			MountPath: "/usr/local/bin/container-scripts",
@@ -78,11 +82,13 @@ func GetInitVolumeMounts() []corev1.VolumeMount {
 		},
 	}
 
+	return c.AppendVolumeMount(vm, extraVol, svc)
 }
 
 // GetVolumeMounts - Nova Control Plane VolumeMounts
-func GetVolumeMounts() []corev1.VolumeMount {
-	return []corev1.VolumeMount{
+func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts, svc []storage.ServiceType) []corev1.VolumeMount {
+	c := storage.CinderExtraVolMounts{}
+	vm := []corev1.VolumeMount{
 		{
 			Name:      "etc-machine-id",
 			MountPath: "/etc/machine-id",
@@ -104,5 +110,5 @@ func GetVolumeMounts() []corev1.VolumeMount {
 			ReadOnly:  false,
 		},
 	}
-
+	return c.AppendVolumeMount(vm, extraVol, svc)
 }
