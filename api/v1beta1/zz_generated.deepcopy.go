@@ -521,7 +521,6 @@ func (in *CinderSpec) DeepCopyInto(out *CinderSpec) {
 			(*out)[key] = *val.DeepCopy()
 		}
 	}
-	in.CephBackend.DeepCopyInto(&out.CephBackend)
 	if in.CephSecret != nil {
 		in, out := &in.CephSecret, &out.CephSecret
 		*out = make([]string, len(*in))

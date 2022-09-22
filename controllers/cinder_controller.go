@@ -46,7 +46,6 @@ import (
 	"github.com/openstack-k8s-operators/lib-common/modules/database"
 	mariadbv1 "github.com/openstack-k8s-operators/mariadb-operator/api/v1beta1"
 
-	"github.com/openstack-k8s-operators/lib-common/modules/storage/ceph"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -637,25 +636,6 @@ func (r *CinderReconciler) generateServiceConfigMaps(
 	templateParameters := make(map[string]interface{})
 	templateParameters["ServiceUser"] = instance.Spec.ServiceUser
 	templateParameters["KeystonePublicURL"] = authURL
-
-	// Select CephBackend
-	cephClient := cinder.GetCephBackend(instance)
-
-	/** If CephBackend info are passed, populate the required templateParameters
-	to make sure Cinder is able to interact with an external Ceph cluster
-	using the Client Key provisioned on Ceph
-	**/
-	if cephClient {
-		templateParameters["ClusterFSID"] = instance.Spec.CephBackend.ClusterFSID
-		templateParameters["ClusterMonHosts"] = instance.Spec.CephBackend.ClusterMonHosts
-		templateParameters["ClientKey"] = instance.Spec.CephBackend.ClientKey
-		// The pool we write in cinder.conf
-		templateParameters["Pool"], _ = ceph.GetPool(instance.Spec.CephBackend.Pools, "cinder")
-		// The ceph user used by the cinder service and defined in the client key
-		templateParameters["User"] = ceph.GetRbdUser(instance.Spec.CephBackend.User)
-		// The OSD caps required in the client keyring
-		templateParameters["OsdCaps"] = ceph.GetOsdCaps(instance.Spec.CephBackend.Pools)
-	}
 
 	cms := []util.Template{
 		// ScriptsConfigMap

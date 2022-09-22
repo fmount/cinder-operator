@@ -18,7 +18,6 @@ package v1beta1
 
 import (
 	"github.com/openstack-k8s-operators/lib-common/modules/common/condition"
-	"github.com/openstack-k8s-operators/lib-common/modules/storage/ceph"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -108,10 +107,6 @@ type CinderSpec struct {
 	// +kubebuilder:validation:Optional
 	// CinderVolumes - Map of chosen names to spec definitions for the Volume(s) service(s) of this Cinder deployment
 	CinderVolumes map[string]CinderVolumeSpec `json:"cinderVolumes"`
-
-	// +kubebuilder:validation:Optional
-	// CephBackend - The ceph Backend structure with all the parameters
-	CephBackend ceph.Backend `json:"cephBackend,omitempty"`
 
 	// +kubebuilder:validation:Required
 	// CephSecret containing Ceph conf and key information
