@@ -6,7 +6,7 @@ import (
 )
 
 // GetVolumes -
-func GetVolumes(parentName string, name string, cephsecret []string) []corev1.Volume {
+func GetVolumes(parentName string, name string, extraVol []corev1.Volume) []corev1.Volume {
 	var config0640AccessMode int32 = 0640
 
 	backupVolumes := []corev1.Volume{
@@ -23,11 +23,11 @@ func GetVolumes(parentName string, name string, cephsecret []string) []corev1.Vo
 		},
 	}
 
-	return append(cinder.GetVolumes(parentName, cephsecret), backupVolumes...)
+	return append(cinder.GetVolumes(parentName, extraVol), backupVolumes...)
 }
 
 // GetInitVolumeMounts - Cinder API init task VolumeMounts
-func GetInitVolumeMounts(cephsecret []string) []corev1.VolumeMount {
+func GetInitVolumeMounts(extraVol []corev1.VolumeMount) []corev1.VolumeMount {
 
 	customConfVolumeMount := corev1.VolumeMount{
 		Name:      "config-data-custom",
@@ -35,10 +35,10 @@ func GetInitVolumeMounts(cephsecret []string) []corev1.VolumeMount {
 		ReadOnly:  true,
 	}
 
-	return append(cinder.GetInitVolumeMounts(cephsecret), customConfVolumeMount)
+	return append(cinder.GetInitVolumeMounts(extraVol), customConfVolumeMount)
 }
 
 // GetVolumeMounts - Cinder API VolumeMounts
-func GetVolumeMounts(cephsecret []string) []corev1.VolumeMount {
-	return cinder.GetVolumeMounts(cephsecret)
+func GetVolumeMounts(extraVol []corev1.VolumeMount) []corev1.VolumeMount {
+	return cinder.GetVolumeMounts(extraVol)
 }

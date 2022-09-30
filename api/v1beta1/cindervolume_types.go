@@ -86,6 +86,10 @@ type CinderVolumeSpec struct {
 	// +kubebuilder:validation:Required
 	// CephSecret containing Ceph conf and key information
 	CephSecret []string `json:"cephSecret,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	// ExtraMounts containing conf files and credentials
+	ExtraMounts CinderVolMounts `json:"extraMounts"`
 }
 
 // CinderVolumeStatus defines the observed state of CinderVolume

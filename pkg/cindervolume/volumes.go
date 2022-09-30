@@ -6,7 +6,7 @@ import (
 )
 
 // GetVolumes -
-func GetVolumes(parentName string, name string, cephsecret []string) []corev1.Volume {
+func GetVolumes(parentName string, name string, extraVol []corev1.Volume) []corev1.Volume {
 	var config0640AccessMode int32 = 0640
 	var dirOrCreate = corev1.HostPathDirectoryOrCreate
 
@@ -82,11 +82,11 @@ func GetVolumes(parentName string, name string, cephsecret []string) []corev1.Vo
 		},
 	}
 
-	return append(cinder.GetVolumes(parentName, cephsecret), volumeVolumes...)
+	return append(cinder.GetVolumes(parentName, extraVol), volumeVolumes...)
 }
 
 // GetInitVolumeMounts - Cinder Volume init task VolumeMounts
-func GetInitVolumeMounts(cephsecret []string) []corev1.VolumeMount {
+func GetInitVolumeMounts(extraVol []corev1.VolumeMount) []corev1.VolumeMount {
 
 	customConfVolumeMount := corev1.VolumeMount{
 		Name:      "config-data-custom",
@@ -94,11 +94,11 @@ func GetInitVolumeMounts(cephsecret []string) []corev1.VolumeMount {
 		ReadOnly:  true,
 	}
 
-	return append(cinder.GetInitVolumeMounts(cephsecret), customConfVolumeMount)
+	return append(cinder.GetInitVolumeMounts(extraVol), customConfVolumeMount)
 }
 
 // GetVolumeMounts - Cinder Volume VolumeMounts
-func GetVolumeMounts(cephsecret []string) []corev1.VolumeMount {
+func GetVolumeMounts(extraVol []corev1.VolumeMount) []corev1.VolumeMount {
 	volumeVolumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "etc-iscsi",
@@ -132,5 +132,5 @@ func GetVolumeMounts(cephsecret []string) []corev1.VolumeMount {
 		},
 	}
 
-	return append(cinder.GetVolumeMounts(cephsecret), volumeVolumeMounts...)
+	return append(cinder.GetVolumeMounts(extraVol), volumeVolumeMounts...)
 }
