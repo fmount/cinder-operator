@@ -707,7 +707,6 @@ func (r *CinderReconciler) apiDeploymentCreateOrUpdate(instance *cinderv1beta1.C
 		deployment.Spec.DatabaseHostname = instance.Status.DatabaseHostname
 		deployment.Spec.DatabaseUser = instance.Spec.DatabaseUser
 		deployment.Spec.Secret = instance.Spec.Secret
-		deployment.Spec.CephSecret = instance.Spec.CephSecret
 		deployment.Spec.ExtraMounts = instance.Spec.ExtraMounts
 
 		err := controllerutil.SetControllerReference(instance, deployment, r.Scheme)
@@ -737,7 +736,6 @@ func (r *CinderReconciler) schedulerDeploymentCreateOrUpdate(instance *cinderv1b
 		deployment.Spec.DatabaseHostname = instance.Status.DatabaseHostname
 		deployment.Spec.DatabaseUser = instance.Spec.DatabaseUser
 		deployment.Spec.Secret = instance.Spec.Secret
-		deployment.Spec.CephSecret = instance.Spec.CephSecret
 		deployment.Spec.ExtraMounts = instance.Spec.ExtraMounts
 
 		err := controllerutil.SetControllerReference(instance, deployment, r.Scheme)
@@ -767,7 +765,6 @@ func (r *CinderReconciler) backupDeploymentCreateOrUpdate(instance *cinderv1beta
 		deployment.Spec.DatabaseHostname = instance.Status.DatabaseHostname
 		deployment.Spec.DatabaseUser = instance.Spec.DatabaseUser
 		deployment.Spec.Secret = instance.Spec.Secret
-		deployment.Spec.CephSecret = instance.Spec.CephSecret
 		deployment.Spec.ExtraMounts = instance.Spec.ExtraMounts
 
 		err := controllerutil.SetControllerReference(instance, deployment, r.Scheme)
@@ -797,7 +794,6 @@ func (r *CinderReconciler) volumeDeploymentCreateOrUpdate(instance *cinderv1beta
 		deployment.Spec.DatabaseHostname = instance.Status.DatabaseHostname
 		deployment.Spec.DatabaseUser = instance.Spec.DatabaseUser
 		deployment.Spec.Secret = instance.Spec.Secret
-		deployment.Spec.CephSecret = instance.Spec.CephSecret
 		deployment.Spec.ExtraMounts = instance.Spec.ExtraMounts
 
 		err := controllerutil.SetControllerReference(instance, deployment, r.Scheme)

@@ -83,13 +83,9 @@ type CinderAPISpec struct {
 	// https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
 
-	// +kubebuilder:validation:Required
-	// CephSecret containing Ceph conf and key information for glance
-	CephSecret []string `json:"cephSecret,omitempty"`
-
 	// +kubebuilder:validation:Optional
 	// ExtraMounts containing conf files and credentials
-	ExtraMounts CinderVolMounts `json:"extraMounts"`
+	ExtraMounts []CinderVolMounts `json:"extraMounts"`
 }
 
 // CinderAPIStatus defines the observed state of CinderAPI

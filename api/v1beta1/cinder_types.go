@@ -108,13 +108,9 @@ type CinderSpec struct {
 	// CinderVolumes - Map of chosen names to spec definitions for the Volume(s) service(s) of this Cinder deployment
 	CinderVolumes map[string]CinderVolumeSpec `json:"cinderVolumes"`
 
-	// +kubebuilder:validation:Required
-	// CephSecret containing Ceph conf and key information
-	CephSecret []string `json:"cephSecret,omitempty"`
-
 	// +kubebuilder:validation:Optional
 	// ExtraMounts containing conf files and credentials
-	ExtraMounts CinderVolMounts `json:"extraMounts"`
+	ExtraMounts []CinderVolMounts `json:"extraMounts"`
 	//ExtraMounts CinderExtraVolMounts `json:"extraMounts"`
 }
 

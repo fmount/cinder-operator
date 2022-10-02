@@ -1,11 +1,12 @@
 package cinder
 
 import (
+	cinderv1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 )
 
 // GetVolumes -
-func GetVolumes(name string, extraVol []corev1.Volume) []corev1.Volume {
+func GetVolumes(name string, extraVol []cinderv1.CinderVolMounts) []corev1.Volume {
 	var scriptsVolumeDefaultMode int32 = 0755
 	var config0640AccessMode int32 = 0640
 
@@ -55,39 +56,17 @@ func GetVolumes(name string, extraVol []corev1.Volume) []corev1.Volume {
 			},
 		},
 	}
-	// Get all the (ceph) secrets passed as argument
-	/*
-		var p []corev1.VolumeProjection
-
-		for _, v := range cephsecret {
-			curr := corev1.VolumeProjection{
-				Secret: &corev1.SecretProjection{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: v,
-					},
-				},
-			}
-			p = append(p, curr)
+	if len(extraVol) > 0 {
+		for _, ev := range extraVol {
+			vms = append(vms, ev.Volumes...)
 		}
-
-		if len(cephsecret) > 0 {
-			curr := corev1.Volume{
-				Name: "ceph-client-conf",
-				VolumeSource: corev1.VolumeSource{
-					Projected: &corev1.ProjectedVolumeSource{
-						Sources: p},
-				},
-			}
-			vms = append(vms, curr)
-		}
-	*/
-	vms = append(vms, extraVol...)
+	}
 
 	return vms
 }
 
 // GetInitVolumeMounts - Nova Control Plane init task VolumeMounts
-func GetInitVolumeMounts(extraVol []corev1.VolumeMount) []corev1.VolumeMount {
+func GetInitVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMount {
 	vm := []corev1.VolumeMount{
 		{
 			Name:      "scripts",
@@ -106,22 +85,16 @@ func GetInitVolumeMounts(extraVol []corev1.VolumeMount) []corev1.VolumeMount {
 		},
 	}
 
-	/*
-		if len(cephsecret) > 0 {
-			c := corev1.VolumeMount{
-				Name:      "ceph-client-conf",
-				MountPath: "/etc/ceph/",
-				ReadOnly:  true,
-			}
-			vm = append(vm, c)
+	if len(extraVol) > 0 {
+		for _, ev := range extraVol {
+			vm = append(vm, ev.Mounts...)
 		}
-	*/
-	vm = append(vm, extraVol...)
+	}
 	return vm
 }
 
 // GetVolumeMounts - Nova Control Plane VolumeMounts
-func GetVolumeMounts(extraVol []corev1.VolumeMount) []corev1.VolumeMount {
+func GetVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMount {
 	vm := []corev1.VolumeMount{
 		{
 			Name:      "etc-machine-id",
@@ -145,16 +118,10 @@ func GetVolumeMounts(extraVol []corev1.VolumeMount) []corev1.VolumeMount {
 		},
 	}
 
-	/*
-		if len(cephsecret) > 0 {
-			c := corev1.VolumeMount{
-				Name:      "ceph-client-conf",
-				MountPath: "/etc/ceph/",
-				ReadOnly:  true,
-			}
-			vm = append(vm, c)
+	if len(extraVol) > 0 {
+		for _, ev := range extraVol {
+			vm = append(vm, ev.Mounts...)
 		}
-	*/
-	vm = append(vm, extraVol...)
+	}
 	return vm
 }
