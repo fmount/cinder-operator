@@ -20,6 +20,7 @@ import (
 	condition "github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/openstack-k8s-operators/lib-common/modules/storage"
 )
 
 // CinderSchedulerSpec defines the desired state of CinderScheduler
@@ -85,8 +86,7 @@ type CinderSchedulerSpec struct {
 
 	// +kubebuilder:validation:Optional
 	// ExtraMounts containing conf files and credentials
-	ExtraMounts []CinderVolMounts `json:"extraMounts"`
-	//ExtraMounts []CinderExtraVolMounts `json:"extraMounts"`
+	ExtraMounts []storage.CinderExtraVolMounts `json:"extraMounts"`
 }
 
 // CinderSchedulerStatus defines the observed state of CinderScheduler

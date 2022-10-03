@@ -19,6 +19,7 @@ package v1beta1
 import (
 	"github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/openstack-k8s-operators/lib-common/modules/storage"
 )
 
 const (
@@ -110,8 +111,7 @@ type CinderSpec struct {
 
 	// +kubebuilder:validation:Optional
 	// ExtraMounts containing conf files and credentials
-	ExtraMounts []CinderVolMounts `json:"extraMounts"`
-	//ExtraMounts CinderExtraVolMounts `json:"extraMounts"`
+	ExtraMounts []storage.CinderExtraVolMounts `json:"extraMounts"`
 }
 
 // CinderStatus defines the observed state of Cinder

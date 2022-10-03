@@ -1,12 +1,12 @@
 package cinder
 
 import (
-	cinderv1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	corev1 "k8s.io/api/core/v1"
+	"github.com/openstack-k8s-operators/lib-common/modules/storage"
 )
 
 // GetVolumes -
-func GetVolumes(name string, extraVol []cinderv1.CinderVolMounts) []corev1.Volume {
+func GetVolumes(name string, extraVol []storage.CinderExtraVolMounts) []corev1.Volume {
 	var scriptsVolumeDefaultMode int32 = 0755
 	var config0640AccessMode int32 = 0640
 
@@ -56,17 +56,12 @@ func GetVolumes(name string, extraVol []cinderv1.CinderVolMounts) []corev1.Volum
 			},
 		},
 	}
-	if len(extraVol) > 0 {
-		for _, ev := range extraVol {
-			vms = append(vms, ev.Volumes...)
-		}
-	}
 
-	return vms
+	return storage.AppendVolume(vms, extraVol)
 }
 
 // GetInitVolumeMounts - Nova Control Plane init task VolumeMounts
-func GetInitVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMount {
+func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
 	vm := []corev1.VolumeMount{
 		{
 			Name:      "scripts",
@@ -85,16 +80,11 @@ func GetInitVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMou
 		},
 	}
 
-	if len(extraVol) > 0 {
-		for _, ev := range extraVol {
-			vm = append(vm, ev.Mounts...)
-		}
-	}
-	return vm
+	return storage.AppendVolumeMount(vm, extraVol)
 }
 
 // GetVolumeMounts - Nova Control Plane VolumeMounts
-func GetVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMount {
+func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
 	vm := []corev1.VolumeMount{
 		{
 			Name:      "etc-machine-id",
@@ -118,10 +108,5 @@ func GetVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMount {
 		},
 	}
 
-	if len(extraVol) > 0 {
-		for _, ev := range extraVol {
-			vm = append(vm, ev.Mounts...)
-		}
-	}
-	return vm
+	return storage.AppendVolumeMount(vm, extraVol)
 }

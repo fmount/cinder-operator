@@ -20,6 +20,7 @@ import (
 	condition "github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/openstack-k8s-operators/lib-common/modules/storage"
 )
 
 // CinderBackupSpec defines the desired state of CinderBackup
@@ -84,7 +85,7 @@ type CinderBackupSpec struct {
 
 	// +kubebuilder:validation:Optional
 	// ExtraMounts containing conf files and credentials
-	ExtraMounts []CinderVolMounts `json:"extraMounts"`
+	ExtraMounts []storage.CinderExtraVolMounts `json:"extraMounts"`
 }
 
 // CinderBackupStatus defines the observed state of CinderBackup

@@ -1,13 +1,13 @@
 package cindervolume
 
 import (
-	cinderv1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	"github.com/openstack-k8s-operators/cinder-operator/pkg/cinder"
 	corev1 "k8s.io/api/core/v1"
+	"github.com/openstack-k8s-operators/lib-common/modules/storage"
 )
 
 // GetVolumes -
-func GetVolumes(parentName string, name string, extraVol []cinderv1.CinderVolMounts) []corev1.Volume {
+func GetVolumes(parentName string, name string, extraVol []storage.CinderExtraVolMounts) []corev1.Volume {
 	var config0640AccessMode int32 = 0640
 	var dirOrCreate = corev1.HostPathDirectoryOrCreate
 
@@ -87,7 +87,7 @@ func GetVolumes(parentName string, name string, extraVol []cinderv1.CinderVolMou
 }
 
 // GetInitVolumeMounts - Cinder Volume init task VolumeMounts
-func GetInitVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMount {
+func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
 
 	customConfVolumeMount := corev1.VolumeMount{
 		Name:      "config-data-custom",
@@ -99,7 +99,7 @@ func GetInitVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMou
 }
 
 // GetVolumeMounts - Cinder Volume VolumeMounts
-func GetVolumeMounts(extraVol []cinderv1.CinderVolMounts) []corev1.VolumeMount {
+func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
 	volumeVolumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "etc-iscsi",
