@@ -142,13 +142,12 @@ Create the secret:
 
 
 The human operator can create several secrets according to the amount of Ceph
-clusters available. The `CephSecret` key, that can be passed to the Cinder
-spec, is supposed to collect the secret names associated to each cluster, then
-the cinder-operator will be able to process the associated data and make them
-available in /etc/ceph, which is the default location where the Ceph
-credentials are stored. The following represents an example of Cinder resource
-that can be used to trigger the service deployment, and enable the rbd backend
-that points to multiple external Ceph clusters.
+clusters available.
+The `extraMounts` API definition allows to specify an arbitraty number of secrets
+that can be passed to the underlying services created by the operator.
+The following represents an example of Cinder resource that can be used to
+trigger the service deployment, and enable the rbd backend that points to
+multiple external Ceph clusters.
 
 ```
 apiVersion: cinder.openstack.org/v1beta1
@@ -185,9 +184,22 @@ spec:
         rbd_pool=volumes
         rbd_flatten_volume_from_snapshot=False
         rbd_secret_uuid=4b5c8c0a-ff60-454b-a1b4-9747aa737d19
-  cephSecret:
-    - cluster1_secret
-    - cluster2_secret
+  extraMounts:
+    - name: CephVolumes
+      region: r1
+      extraVolumes:
+      volumes:
+        - name: ceph
+          projected:
+            sources:
+            - secret:
+              name: ceph-client-conf
+            - secret:
+              name: ceph-client-conf2
+      mounts:
+        - name: ceph
+          mountPath: "/etc/ceph"
+          readOnly: true
 ```
 
 When the service is up and running, it's possible to interact with the exposed
