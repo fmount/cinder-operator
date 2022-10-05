@@ -1,6 +1,8 @@
 package cinder
 
 import (
+	"lib-common/modules/storage"
+
 	cinderv1beta1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	common "github.com/openstack-k8s-operators/lib-common/modules/common"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/env"
@@ -55,10 +57,10 @@ func DbSyncJob(instance *cinderv1beta1.Cinder, labels map[string]string) *batchv
 								RunAsUser: &runAsUser,
 							},
 							Env:          env.MergeEnvs([]corev1.EnvVar{}, envVars),
-							VolumeMounts: GetVolumeMounts(instance.Spec.ExtraMounts),
+							VolumeMounts: GetVolumeMounts([]storage.CinderExtraVolMounts{}),
 						},
 					},
-					Volumes: GetVolumes(instance.Name, instance.Spec.ExtraMounts),
+					Volumes: GetVolumes(instance.Name, []storage.CinderExtraVolMounts{}),
 				},
 			},
 		},

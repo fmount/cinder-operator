@@ -19,7 +19,7 @@ package v1beta1
 import (
 	"github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/openstack-k8s-operators/lib-common/modules/storage"
+	"github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 )
 
 const (

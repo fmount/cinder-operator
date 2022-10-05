@@ -9,6 +9,7 @@ import (
 func GetVolumes(name string, extraVol []storage.CinderExtraVolMounts) []corev1.Volume {
 	var scriptsVolumeDefaultMode int32 = 0755
 	var config0640AccessMode int32 = 0640
+	c := storage.CinderExtraVolMounts{}
 
 	vms := []corev1.Volume{
 		{
@@ -57,11 +58,12 @@ func GetVolumes(name string, extraVol []storage.CinderExtraVolMounts) []corev1.V
 		},
 	}
 
-	return storage.AppendVolume(vms, extraVol)
+	return c.AppendVolume(vms, extraVol)
 }
 
 // GetInitVolumeMounts - Nova Control Plane init task VolumeMounts
 func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
+	c := storage.CinderExtraVolMounts{}
 	vm := []corev1.VolumeMount{
 		{
 			Name:      "scripts",
@@ -80,11 +82,12 @@ func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.Volum
 		},
 	}
 
-	return storage.AppendVolumeMount(vm, extraVol)
+	return c.AppendVolumeMount(vm, extraVol)
 }
 
 // GetVolumeMounts - Nova Control Plane VolumeMounts
 func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
+	c := storage.CinderExtraVolMounts{}
 	vm := []corev1.VolumeMount{
 		{
 			Name:      "etc-machine-id",
@@ -107,6 +110,5 @@ func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMou
 			ReadOnly:  false,
 		},
 	}
-
-	return storage.AppendVolumeMount(vm, extraVol)
+	return c.AppendVolumeMount(vm, extraVol)
 }
