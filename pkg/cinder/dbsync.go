@@ -66,7 +66,7 @@ func DbSyncJob(instance *cinderv1beta1.Cinder, labels map[string]string) *batchv
 		},
 	}
 
-	job.Spec.Template.Spec.Volumes = GetVolumes(ServiceName, instance.Spec.ExtraMounts)
+	job.Spec.Template.Spec.Volumes = GetVolumes(ServiceName, []storage.CinderExtraVolMounts{})
 
 	initContainerDetails := APIDetails{
 		ContainerImage:       instance.Spec.CinderAPI.ContainerImage,
@@ -76,7 +76,7 @@ func DbSyncJob(instance *cinderv1beta1.Cinder, labels map[string]string) *batchv
 		OSPSecret:            instance.Spec.Secret,
 		DBPasswordSelector:   instance.Spec.PasswordSelectors.Database,
 		UserPasswordSelector: instance.Spec.PasswordSelectors.Service,
-		VolumeMounts:         GetInitVolumeMounts(instance.Spec.ExtraMounts),
+		VolumeMounts:         GetInitVolumeMounts([]storage.CinderExtraVolMounts{}),
 	}
 	job.Spec.Template.Spec.InitContainers = InitContainer(initContainerDetails)
 
