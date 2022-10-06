@@ -84,6 +84,7 @@ spec:
               extraMounts:
                 description: ExtraMounts containing conf files and credentials
                 items:
+                  description: CinderExtraMounts contains conf files and credentials
                   properties:
                     extraVol:
                       items:
@@ -133,6 +134,14 @@ spec:
                               type: object
                             type: array
                           propagation:
+                            description: Propagation defines which pod should mount
+                              the volume
+                            enum:
+                            - All
+                            - CinderBackup
+                            - CinderVolume
+                            - GlanceInternal
+                            - GlanceExternal
                             type: string
                           volumes:
                             items:

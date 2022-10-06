@@ -3,7 +3,7 @@ package cinderbackup
 import (
 	"github.com/openstack-k8s-operators/cinder-operator/pkg/cinder"
 	corev1 "k8s.io/api/core/v1"
-	"github.com/openstack-k8s-operators/lib-common/modules/storage"
+	"lib-common/modules/storage"
 )
 
 // GetVolumes -
@@ -24,7 +24,7 @@ func GetVolumes(parentName string, name string, extraVol []storage.CinderExtraVo
 		},
 	}
 
-	return append(cinder.GetVolumes(parentName, extraVol), backupVolumes...)
+	return append(cinder.GetVolumes(parentName, extraVol, storage.CinderBackup), backupVolumes...)
 }
 
 // GetInitVolumeMounts - Cinder Backup init task VolumeMounts
@@ -35,10 +35,10 @@ func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.Volum
 		MountPath: "/var/lib/config-data/custom",
 		ReadOnly:  true,
 	}
-	return append(cinder.GetInitVolumeMounts(extraVol), customConfVolumeMount)
+	return append(cinder.GetInitVolumeMounts(extraVol, storage.CinderBackup), customConfVolumeMount)
 }
 
 // GetVolumeMounts - Cinder Backup VolumeMounts
 func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
-	return cinder.GetVolumeMounts(extraVol)
+	return cinder.GetVolumeMounts(extraVol, storage.CinderBackup)
 }

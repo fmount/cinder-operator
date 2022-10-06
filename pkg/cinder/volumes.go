@@ -2,11 +2,11 @@ package cinder
 
 import (
 	corev1 "k8s.io/api/core/v1"
-	"github.com/openstack-k8s-operators/lib-common/modules/storage"
+	"lib-common/modules/storage"
 )
 
 // GetVolumes -
-func GetVolumes(name string, extraVol []storage.CinderExtraVolMounts) []corev1.Volume {
+func GetVolumes(name string, extraVol []storage.CinderExtraVolMounts, svc storage.ServiceType) []corev1.Volume {
 	var scriptsVolumeDefaultMode int32 = 0755
 	var config0640AccessMode int32 = 0640
 	c := storage.CinderExtraVolMounts{}
@@ -58,11 +58,11 @@ func GetVolumes(name string, extraVol []storage.CinderExtraVolMounts) []corev1.V
 		},
 	}
 
-	return c.AppendVolume(vms, extraVol)
+	return c.AppendVolume(vms, extraVol, svc)
 }
 
 // GetInitVolumeMounts - Nova Control Plane init task VolumeMounts
-func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
+func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts, svc storage.ServiceType) []corev1.VolumeMount {
 	c := storage.CinderExtraVolMounts{}
 	vm := []corev1.VolumeMount{
 		{
@@ -82,11 +82,11 @@ func GetInitVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.Volum
 		},
 	}
 
-	return c.AppendVolumeMount(vm, extraVol)
+	return c.AppendVolumeMount(vm, extraVol, svc)
 }
 
 // GetVolumeMounts - Nova Control Plane VolumeMounts
-func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMount {
+func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts, svc storage.ServiceType) []corev1.VolumeMount {
 	c := storage.CinderExtraVolMounts{}
 	vm := []corev1.VolumeMount{
 		{
@@ -110,5 +110,5 @@ func GetVolumeMounts(extraVol []storage.CinderExtraVolMounts) []corev1.VolumeMou
 			ReadOnly:  false,
 		},
 	}
-	return c.AppendVolumeMount(vm, extraVol)
+	return c.AppendVolumeMount(vm, extraVol, svc)
 }
