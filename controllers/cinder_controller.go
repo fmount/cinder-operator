@@ -835,13 +835,13 @@ func (r *CinderReconciler) reconcileNormal(ctx context.Context, instance *cinder
 		}
 	}
 
-	// deploy cinder-backup, but only if necessary
-	//
-	// Many OpenStack deployments don't use the cinder-backup service (it's optional),
-	// so there's no need to deploy it unless it's required.
+	// deploy cinder-backup
+	// Note: many openstack deployments don't use the cinder-backup service
+	// (it's optional), so there's no need to deploy it unless it's required.
 	var backupCondition *condition.Condition
-	if *instance.Spec.CinderBackup.Replicas > 0 {
-		cinderBackup, op, err := r.backupDeploymentCreateOrUpdate(ctx, instance)
+	waitingBkpGenerationMatch := false
+	for name, backup := range instance.Spec.CinderBackups {
+		cinderBackup, op, err := r.backupDeploymentCreateOrUpdate(ctx, instance, name, backup)
 		if err != nil {
 			instance.Status.Conditions.Set(condition.FalseCondition(
 				cinderv1beta1.CinderBackupReadyCondition,
@@ -854,30 +854,38 @@ func (r *CinderReconciler) reconcileNormal(ctx context.Context, instance *cinder
 		if op != controllerutil.OperationResultNone {
 			Log.Info(fmt.Sprintf("Backup CR for %s successfully %s", instance.Name, string(op)))
 		}
-
-		// Mirror values when the data in the StatefulSet is for the current generation
-		if cinderBackup.Generation == cinderBackup.Status.ObservedGeneration {
+		if cinderBackup.Generation != cinderBackup.Status.ObservedGeneration {
+			waitingBkpGenerationMatch = true
+		} else {
 			// Mirror CinderBackup status' ReadyCount to this parent CR
-			instance.Status.CinderBackupReadyCount = cinderBackup.Status.ReadyCount
+			if instance.Status.CinderBackupsReadyCounts == nil {
+				instance.Status.CinderVolumesReadyCounts = map[string]int32{}
+			}
+			instance.Status.CinderBackupsReadyCounts[name] = cinderBackup.Status.ReadyCount
 
-			// Mirror CinderBackup's condition status
-			backupCondition = cinderBackup.Status.Conditions.Mirror(cinderv1beta1.CinderBackupReadyCondition)
-			instance.Status.Conditions.Set(backupCondition)
+			// If this cinderBackup is not IsReady, mirror the condition to get the latest step it is in.
+			// Could also check the overall ReadyCondition of the cinderBackup.
+			if !cinderBackup.IsReady() {
+				c := cinderBackup.Status.Conditions.Mirror(cinderv1beta1.CinderBackupReadyCondition)
+				// Get the condition with higher priority for backupCondition.
+				backupCondition = condition.GetHigherPrioCondition(c, backupCondition).DeepCopy()
+			}
 		}
+	}
 
-	} else {
-		// Clean up cinder-backup if there are no replicas
-		err = r.backupCleanupDeployment(ctx, instance)
-		if err != nil {
-			// Should we set the condition to False?
-			return ctrl.Result{}, err
-		}
-		// TODO: Wait for the deployment to actually disappear before setting the condition
-
-		// The CinderBackup is ready, even if the service wasn't deployed.
+	if backupCondition != nil {
+		// If there was a Status=False condition, set that as the CinderBackupReadyCondition
+		instance.Status.Conditions.Set(backupCondition)
+	} else if !waitingBkpGenerationMatch {
+		// The CinderBackups are ready.
 		// Using "condition.DeploymentReadyMessage" here because that is what gets mirrored
 		// as the message for the other Cinder children when they are successfully-deployed
 		instance.Status.Conditions.MarkTrue(cinderv1beta1.CinderBackupReadyCondition, condition.DeploymentReadyMessage)
+	}
+
+	err = r.backupCleanupDeployment(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
 	}
 
 	// deploy cinder-volumes
@@ -1255,10 +1263,15 @@ func (r *CinderReconciler) schedulerDeploymentCreateOrUpdate(ctx context.Context
 	return deployment, op, err
 }
 
-func (r *CinderReconciler) backupDeploymentCreateOrUpdate(ctx context.Context, instance *cinderv1beta1.Cinder) (*cinderv1beta1.CinderBackup, controllerutil.OperationResult, error) {
+func (r *CinderReconciler) backupDeploymentCreateOrUpdate(
+	ctx context.Context,
+	instance *cinderv1beta1.Cinder,
+	name string,
+	bkpTemplate cinderv1beta1.CinderBackupTemplate,
+) (*cinderv1beta1.CinderBackup, controllerutil.OperationResult, error) {
 	cinderBackupSpec := cinderv1beta1.CinderBackupSpec{
 		CinderTemplate:       instance.Spec.CinderTemplate,
-		CinderBackupTemplate: instance.Spec.CinderBackup,
+		CinderBackupTemplate: bkpTemplate,
 		ExtraMounts:          instance.Spec.ExtraMounts,
 		DatabaseHostname:     instance.Status.DatabaseHostname,
 		TransportURLSecret:   instance.Status.TransportURLSecret,
@@ -1273,8 +1286,9 @@ func (r *CinderReconciler) backupDeploymentCreateOrUpdate(ctx context.Context, i
 
 	deployment := &cinderv1beta1.CinderBackup{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("%s-backup", instance.Name),
+			Name:      fmt.Sprintf("%s-backup-%s", instance.Name, name),
 			Namespace: instance.Namespace,
+			Labels:    map[string]string{cinderv1beta1.Backend: name},
 		},
 	}
 

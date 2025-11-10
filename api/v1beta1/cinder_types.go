@@ -129,8 +129,8 @@ type CinderSpecCore struct {
 	CinderScheduler CinderSchedulerTemplateCore `json:"cinderScheduler"`
 
 	// +kubebuilder:validation:Optional
-	// CinderBackup - Spec definition for the Backup service of this Cinder deployment
-	CinderBackup CinderBackupTemplateCore `json:"cinderBackup"`
+	// CinderBackup - Spec definition for a list of Backup services of this Cinder deployment
+	CinderBackups map[string]CinderBackupTemplateCore `json:"cinderBackup,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	// CinderVolumes - Map of chosen names to spec definitions for the Volume(s) service(s) of this Cinder deployment
@@ -151,7 +151,7 @@ type CinderSpec struct {
 
 	// +kubebuilder:validation:Optional
 	// CinderBackup - Spec definition for the Backup service of this Cinder deployment
-	CinderBackup CinderBackupTemplate `json:"cinderBackup"`
+	CinderBackups map[string]CinderBackupTemplate `json:"cinderBackups,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	// CinderVolumes - Map of chosen names to spec definitions for the Volume(s) service(s) of this Cinder deployment
@@ -186,10 +186,8 @@ type CinderStatus struct {
 	// +kubebuilder:default=0
 	CinderAPIReadyCount int32 `json:"cinderAPIReadyCount"`
 
-	// ReadyCount of Cinder Backup instance
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:default=0
-	CinderBackupReadyCount int32 `json:"cinderBackupReadyCount"`
+	// ReadyCounts of Cinder Backup instances
+	CinderBackupsReadyCounts map[string]int32 `json:"cinderBackupsReadyCounts,omitempty"`
 
 	// ReadyCount of Cinder Scheduler instance
 	// +kubebuilder:validation:Minimum=0

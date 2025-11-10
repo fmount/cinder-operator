@@ -91,8 +91,12 @@ func (r *Cinder) Default() {
 		r.Spec.CinderAPI.ContainerImage = cinderDefaults.APIContainerImageURL
 	}
 
-	if r.Spec.CinderBackup.ContainerImage == "" {
-		r.Spec.CinderBackup.ContainerImage = cinderDefaults.BackupContainerImageURL
+	for index, cinderBackup := range r.Spec.CinderBackups {
+		if cinderBackup.ContainerImage == "" {
+			cinderBackup.ContainerImage = cinderDefaults.BackupContainerImageURL
+		}
+		// This is required, as the loop variable is a by-value copy
+		r.Spec.CinderBackups[index] = cinderBackup
 	}
 
 	if r.Spec.CinderScheduler.ContainerImage == "" {
@@ -333,11 +337,13 @@ func (spec *CinderSpecCore) ValidateCinderTopology(basePath *field.Path, namespa
 	allErrs = append(allErrs,
 		spec.CinderScheduler.ValidateTopology(scPath, namespace)...)
 
-	// When a TopologyRef CR is referenced with an override to CinderBackup,
-	// fail if a different Namespace is referenced because not supported
-	bkPath := basePath.Child("cinderBackup")
-	allErrs = append(allErrs,
-		spec.CinderBackup.ValidateTopology(bkPath, namespace)...)
+	// When a TopologyRef CR is referenced with an override to an instance of
+	// CinderBackups, fail if a different Namespace is referenced because not
+	// supported
+	for k, ms := range spec.CinderBackups {
+		path := basePath.Child("cinderBackups").Key(k)
+		allErrs = append(allErrs, ms.ValidateTopology(path, namespace)...)
+	}
 
 	// When a TopologyRef CR is referenced with an override to an instance of
 	// CinderVolumes, fail if a different Namespace is referenced because not
@@ -372,11 +378,13 @@ func (spec *CinderSpec) ValidateCinderTopology(basePath *field.Path, namespace s
 	allErrs = append(allErrs,
 		spec.CinderScheduler.ValidateTopology(scPath, namespace)...)
 
-	// When a TopologyRef CR is referenced with an override to CinderBackup,
-	// fail if a different Namespace is referenced because not supported
-	bkPath := basePath.Child("cinderBackup")
-	allErrs = append(allErrs,
-		spec.CinderBackup.ValidateTopology(bkPath, namespace)...)
+	// When a TopologyRef CR is referenced with an override to an instance of
+	// CinderBackups, fail if a different Namespace is referenced because not
+	// supported
+	for k, ms := range spec.CinderVolumes {
+		bkPath := basePath.Child("cinderBackups").Key(k)
+		allErrs = append(allErrs, ms.ValidateTopology(bkPath, namespace)...)
+	}
 
 	// When a TopologyRef CR is referenced with an override to an instance of
 	// CinderVolumes, fail if a different Namespace is referenced because not
