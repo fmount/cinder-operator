@@ -1097,6 +1097,10 @@ func (r *CinderAPIReconciler) generateServiceConfigs(
 		"LogFile": cinderapi.LogFile,
 	}
 
+	if instance.Spec.TLS.CaBundleSecretName != "" {
+		templateParameters["CaFilePath"] = tls.DownstreamTLSCABundlePath
+	}
+
 	configTemplates := []util.Template{
 		{
 			Name:          fmt.Sprintf("%s-config-data", instance.Name),
